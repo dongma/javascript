@@ -48,3 +48,8 @@ console.log("undefined value: " + flight.status);
 // 一个比较好的技巧是可以使用"||"对对象填充默认值.
 var status = flight.status || "unknown";
 console.log("status value: " + status);
+// 从undefined属性中进行读取property会返回TypeError异常类型.可以通过&&运算符来避免错误.
+console.log("flight.equipment:" + flight.equipment);    // 返回的值为undefined.
+console.log("flight.equipment.model:" + flight.equipment.model);    // 会抛出"TypeError异常类型"
+// 表达式计算之后的结果值为Undefined.
+console.log("&& operator避免throw异常类型: " + flight.equipment.model&&flight.equipment);

@@ -1,0 +1,2 @@
+### javascript_syntax基本语法(函数、原型继承、function)
+1. javascript基本数据类型: 数字、字符串、布尔值(true & false)、null值和undefined.其它所有的值都是对象，数字、字符串和布尔值貌似对象，因为它们拥有方法，但是它们是不可变的。javascript中的对象是可变的键控集合(keyed collections)。在javascript中，数组是对象，函数也是对象、正则表达式也是对象，当然，对象也是对象。 
