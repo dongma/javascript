@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="920174c0-3d32-4c77-b38d-48a1801ea27d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grammer/function.js" afterPath="$PROJECT_DIR$/grammer/function.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../readme.md" afterPath="$PROJECT_DIR$/../readme.md" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -21,12 +20,24 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="function.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="function.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grammer/function.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="598">
-              <caret line="126" column="0" lean-forward="true" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+            <state relative-caret-position="53">
+              <caret line="87" column="45" lean-forward="true" selection-start-line="87" selection-start-column="45" selection-end-line="93" selection-end-column="2" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="inheritance.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/grammer/inheritance.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="454">
+              <caret line="197" column="29" lean-forward="false" selection-start-line="197" selection-start-column="29" selection-end-line="197" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#37#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -48,6 +59,7 @@
       <list>
         <option value="$PROJECT_DIR$/grammer/grammer.js" />
         <option value="$PROJECT_DIR$/grammer/function.js" />
+        <option value="$PROJECT_DIR$/grammer/inheritance.js" />
       </list>
     </option>
   </component>
@@ -108,12 +120,16 @@
     <property name="js.eslint.eslintPackage" value="" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="FullScreen" value="true" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
   </component>
-  <component name="RunManager" selected="Node.js.function.js">
+  <component name="RunManager" selected="Node.js.inheritance.js">
     <configuration default="false" name="grammer.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="grammer.js" working-dir="$PROJECT_DIR$/grammer">
       <method />
     </configuration>
     <configuration default="false" name="function.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="function.js" working-dir="$PROJECT_DIR$/grammer">
+      <method />
+    </configuration>
+    <configuration default="false" name="inheritance.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="inheritance.js" working-dir="$PROJECT_DIR$/grammer">
       <method />
     </configuration>
     <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
@@ -175,19 +191,24 @@
       <recursive>false</recursive>
       <method />
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Node.js.grammer.js" />
       <item index="1" class="java.lang.String" itemvalue="Node.js.function.js" />
+      <item index="2" class="java.lang.String" itemvalue="Node.js.inheritance.js" />
     </list>
     <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Node.js.function.js" />
-        <item index="1" class="java.lang.String" itemvalue="Node.js.grammer.js" />
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="Node.js.inheritance.js" />
+        <item index="1" class="java.lang.String" itemvalue="Node.js.function.js" />
+        <item index="2" class="java.lang.String" itemvalue="Node.js.grammer.js" />
       </list>
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -201,6 +222,7 @@
       <workItem from="1527521870339" duration="872000" />
       <workItem from="1527693500292" duration="4789000" />
       <workItem from="1527864014152" duration="16506000" />
+      <workItem from="1528035055153" duration="7542000" />
     </task>
     <task id="LOCAL-00001" summary="#属性检索retrieval property">
       <created>1527522523238</created>
@@ -213,13 +235,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25533000" />
+    <option name="totallyTimeSpent" value="33075000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1366" height="768" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16133828" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16133828" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32905295" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32871014" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -271,6 +293,14 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/grammer/function.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2268">
+          <caret line="126" column="0" lean-forward="true" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/grammer/grammer.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -313,9 +343,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grammer/function.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="598">
-          <caret line="126" column="0" lean-forward="true" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+        <state relative-caret-position="53">
+          <caret line="87" column="45" lean-forward="true" selection-start-line="87" selection-start-column="45" selection-end-line="93" selection-end-column="2" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grammer/inheritance.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="454">
+          <caret line="197" column="29" lean-forward="false" selection-start-line="197" selection-start-column="29" selection-end-line="197" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#37#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
