@@ -89,3 +89,63 @@ Function.method('curry', function(){
 });
 ```
 >js的闭包比较强大，通过函数的闭包可以将函数的属性值设置为私有(只能通过返回的方法引用进行获取其属性值)，此外，在闭包中也可以对函数计算的结果进行缓存减少了函数的运算量。此外，函数的模块化指的是：对外隐藏函数实现细节。
+3. 继承(inheritance)用法
+>在一些基于类的语言(比如java)中，继承提供了两个有用的服务：继承的出现是为了解决面向对象编程中的代码重用问题。另外，继承的出现也引入了类型系统的概念，父类与子类之间的继承关系，在进行编码的时候不需要进行显示的类型转换，子类可以进行安全的向上的类型转换。javascript是一门基于原型的语言，这意味着对象可以直接从其他对象继承。<br/>
+>伪类(pseudoclassical)的概念：javascript不直接让对象从其它对象进行继承，反而插入了一个多余的间接层：通过构造器函数产生对象。当一个函数对象被创建的时候，Function构造器产生的函数对象会运行类似这样的一段代码：` this.prototype = {constructor:this}; `新函数对象被赋予一个prototype属性，它的值是一个包含constructor属性且属性值为该新函数的对象。这个`prototype`属性是存放继承特征的地方。因为javascript语言没有提供一个方法去确定那个函数是用来打算做构造器的，所以每一个函数都会得到一个`prototype`对象。{将一个对象的`prototype`属性值替换为一个函数的实例，这样该函数也就默认继承了该实例的方法}.
+```javascript
+// 创建一个构造器并且扩充它的原型.
+var Mammal = function(name) {this.name=name;};
+Mammal.prototype.get_name = function() {return this.name; };
+Mammal.prototype.says = function() {return this.saying || '';};
+// 可以通过new操作符构建一个实例，并调用其方法.
+var myMammal = new Mymmal('herb the mammal');
+var name = myMammal.get_name();  // 'herb the mammal'
+// 接着我们构造一个伪类来继承Mammal，方式为通过定义它的constructor函数并替换它的prorotype为一个Mammal的实例来实现的:
+var Cat = function(name) {
+  this.name = name;
+  this.saying = 'meow';
+};
+Cat.prototype = new Mammal();    // 替换Cat.prototype为一个新的Mammal实例.
+// 扩充新原型对象,增加get_name方法.
+Cat.prototype.get_name = function() {
+  return this.says() + ' ' + this.name + ' ' + this.says();
+};
+var myCat = new Cat('Henrietta');
+var says = myCat.says();	// 'meow'
+var name = myCat.get_name();	// 'meow Henrietta meow'
+/**
+ * 伪类模式本意是想向面向对象靠拢，但是看起来格格不入。可以隐藏一些实现的细节，使用method方法来定义一个inherits方法实现。
+ */
+Function.method('inherits', function(Parent){
+  this.prototype = new Parent();
+  return this;
+});
+// 由于method和inherits方法都返回this,这样允许我们可以采用级联的形式编程。
+var Cat = function(name) {
+  this.name = name;
+  this.saying = 'meow';
+}.inherits(Mammal)
+.method('purr', function(n){
+  var i, s = '';
+  for(i=0; i<n; i+=1)
+  	if(s) s += '-';
+  	s += 'r';
+  return s;
+})
+.method('get_name', function(){
+  return this.says() + ' ' + this.name + ' ' + this.says();
+});
+```
+> 通过隐藏那些无畏的prototype操作细节，现在它看起来没有那么怪异了。存在的问题：没有私有环境，所有的属性都是公开的，无法访问super（父类）的方法；更糟糕的是使用构造器存在一个危害，如果你在调用构造器函数时忘记了在前面加上`new`前缀，那么this将不会绑定到一个新对象上。悲剧的是this将会绑定到全局对象上，所以你不但没有扩充新对象，反而破坏了全局变量环境。
+> 对象说明符：当构造器中参数比较多的时候，给构造器传递参数需要记住参数的顺序是非常困难的。在这种情况下，可以通过简单的对象说明符进行简化：
+```javascript
+var myObject = maker(f, i, m, c, s);
+// 使用对象说明符的方式,显然第二种方式更为简化。
+var myObject = maker({
+  first: f,
+  middle: m,
+  last: l,
+  state: s,
+  city: c
+});
+```

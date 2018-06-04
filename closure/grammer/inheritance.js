@@ -164,7 +164,6 @@ var coolcat = function(spec) {
 var myCoolCat = coolcat({name: 'Bix'});
 var name = myCoolCat.get_name();
 console.log('myCoolCat.get_name: ' + name);
-
 /**
  * 5.部件part.
  * */
@@ -195,7 +194,7 @@ var eventuality = function (that) {
     that.on = function(type, method, parameters) {
         // 注册一个事件构造一条处理程序条目,将它插入到处理程序数组中,如果这种类型的事件还不存在,那构造一个.
         var handler = {
-            method: methodcd 
+            method: method,
             parameters: parameters
         };
         if(registry.hasOwnProperty(type)) {
