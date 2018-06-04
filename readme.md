@@ -201,9 +201,9 @@ var numbers_object = {'0':'zero', '1':'one', '2':'two', '3':'three'};
 ```
 >numbers和numbers_obejct操作看起来是一致的，但是其也有一些显著的不同：numbers继承自`Array.prototype`而numbers_object继承自`Object.prototype`，因而numbers继承了大量有用的方法。同时numbers包含length属性而numbers_object没有；<br/>
 >如何删除javascript中数组的元素是一个有趣的问题：可以通过使用`delete`运算符从数组中删除元素：` delete numbers[2] `不过在numbers[2]处的元素数值为`undefined`而并不是所期望的删除元素的空间，后边的元素append到被删除元素之前的元素。javascript也提供了一个splice方法，该方法用来删除一些元素并将它们替换为其他的元素。被删除属性后面的每个属性必须被移除，并且以一个新的键值重新插入。
-> ```javascript
+```javascript
 numbers.splice(2, 1);	// numbers为['zero', 'one', 'shi', 'go']
-> ```
+```
 > 可以使用for.in循环进行迭代数组中的元素，但是迭代的结果会是无序的。如果通过for循环打印元素的值会按照正常的顺序显示出来；如何判断一个对象是数组还是普通的对象：
 ```javascript
 var is_array = function(value) {
