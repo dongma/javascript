@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="920174c0-3d32-4c77-b38d-48a1801ea27d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grammer/inheritance.js" afterPath="$PROJECT_DIR$/grammer/inheritance.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../readme.md" afterPath="$PROJECT_DIR$/../readme.md" />
-    </list>
+    <list default="true" id="920174c0-3d32-4c77-b38d-48a1801ea27d" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -240,7 +236,7 @@
       <workItem from="1527693500292" duration="4789000" />
       <workItem from="1527864014152" duration="16506000" />
       <workItem from="1528035055153" duration="7924000" />
-      <workItem from="1528120584779" duration="713000" />
+      <workItem from="1528120584779" duration="802000" />
     </task>
     <task id="LOCAL-00001" summary="#属性检索retrieval property">
       <created>1527522523238</created>
@@ -253,7 +249,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34170000" />
+    <option name="totallyTimeSpent" value="34259000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1366" height="768" extended-state="0" />

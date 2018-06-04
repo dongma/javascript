@@ -149,3 +149,47 @@ var myObject = maker({
   city: c
 });
 ```
+>函数化(functional)：迄今为止我们看到的继承模式的一个弱点就是没法保护隐私。对象的所有属性都是可见的，我们没法得到私有变量和私有函数。通过函数化对对象的属性和方法进行私有化：步骤可以分为4部分：1.创建一个对象，有很多种方式去构造一个对象。它可以构造一个对象字面量或者可以使用new前缀调用一个构造函数。2.有选择的去定义私有变量和方法。3.给这个新对象扩充方法，这些方法拥有特权去访问参数以及在第二步中通过var声明的变量。4.返回那个新的对象；
+```javascript
+var cat = function(spec) {
+    spec.saying = spec.saying || 'meow';
+    var that = mammal(spec);
+    that.purr = function(n) {
+      var i, s = '';
+      for(i = 0; i < n; i+=1) {
+          if(s) s += '-';
+          s += 'r';
+      }
+      return s;
+  };
+  that.get_name = function() {
+      return that.says() + ' ' + spec.name + '  ' + that.says();
+  };
+  return that;
+};
+var myCat = cat({name: 'Henrietta'});
+/**
+ * 函数化模式还给我们提供了一个处理父类方法的方法,我们会构造一个superior方法,它取得一个方法名并返回
+ * 调用那个方法的函数,该函数会调用原来的方法,尽管属性已经变化了.
+ * */
+Object.method('superior', function (name) {
+    var that = this,
+      method = that[name];	// 通过对象的属性引用符得到name对应的Method对象
+    return function() {
+        return method.apply(that, arguments);
+    };
+});
+// 我们在coolcat上试验一下,coolcat就像cat一样,除了它有一个更酷的调用父类方法的get_name外,在coolcat中的父类方法指的是cat(spec)中的get_name方法.
+// 我们会声明一个super_get_name变量并且把调用superior方法所返回的结果赋值给它.
+var coolcat = function(spec) {
+    var that = cat(spec),
+        super_get_name = that.superior('get_name');
+    that.get_name = function(n) {
+        return 'like ' + super_get_name() + ' baby';
+    }
+    return that;
+};
+var myCoolCat = coolcat({name: 'Bix'});
+var name = myCoolCat.get_name();
+console.log('myCoolCat.get_name: ' + name);
+```
