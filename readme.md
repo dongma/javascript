@@ -193,3 +193,29 @@ var myCoolCat = coolcat({name: 'Bix'});
 var name = myCoolCat.get_name();
 console.log('myCoolCat.get_name: ' + name);
 ```
+4. 关于javascript中的数组对象
+>数组是一段线性分配的内存，它通过整数计算偏移并访问其中的元素，数组由于内存连续因而其操作是非常快速的。但是javascript并没有类似数组的结构，它提供的是一种类数组特性的对象。在大多数语言中，一个数组中的所有元素都要求必须是同一种类型，但是javascript允许数组元素包含任意混合类型的值。
+```javascript
+var numbers = ['zero', 'one', 'tow', 'three'];
+var numbers_object = {'0':'zero', '1':'one', '2':'two', '3':'three'};
+```
+>numbers和numbers_obejct操作看起来是一致的，但是其也有一些显著的不同：numbers继承自`Array.prototype`而numbers_object继承自`Object.prototype`，因而numbers继承了大量有用的方法。同时numbers包含length属性而numbers_object没有；<br/>
+>如何删除javascript中数组的元素是一个有趣的问题：可以通过使用`delete`运算符从数组中删除元素：` delete numbers[2] `不过在numbers[2]处的元素数值为`undefined`而并不是所期望的删除元素的空间，后边的元素append到被删除元素之前的元素。javascript也提供了一个splice方法，该方法用来删除一些元素并将它们替换为其他的元素。被删除属性后面的每个属性必须被移除，并且以一个新的键值重新插入。
+> ```javascript
+numbers.splice(2, 1);	// numbers为['zero', 'one', 'shi', 'go']
+> ```
+> 可以使用for.in循环进行迭代数组中的元素，但是迭代的结果会是无序的。如果通过for循环打印元素的值会按照正常的顺序显示出来；如何判断一个对象是数组还是普通的对象：
+```javascript
+var is_array = function(value) {
+  return Object.prototype.toString.apply(value) === '[Object Array]';
+};
+```
+>此外可以通过Array.prototype原型对数组的方法进行扩充：通过给`Array.prototype`扩充一个函数，每个数组都继承了这个方法。在这个例子中，我们定义了一个`reduce`方法它接受一个参数和一个初始值作为参数。它遍历这个数组，以当前元素和该初始值为参数调用这个函数，并计算出一个新值，此外数组中元素的默认值为undefined值。
+```javascript
+Array.method('reduce', function(f, value){
+  var i;
+  for(i = 0; i < this.length; i+=1)
+    value = f(this[i], value);
+  return value;
+});
+```
