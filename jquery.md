@@ -39,6 +39,41 @@
   var uniqueArray = $.unique([1, 3, 4, 5, 3]);  // 最终结果之后包含一个3
   var mergeArray = $.merge(anArray, [2, 4, 6]); // anArray会包含2,4,6的元素
 ```
+8. 扩展对象/通过该方法可以对javascript对象执行复制的操作，将后续对象的属性复制到target对象上.
+```javascript
+  // 语法: $.extend(deep, target, source1, source2,...sourceN) deep表示是否执行深复制默认为false,最终的结果会将sourceN的属性复制到target对象上.
+  var target = { a:1, b:2, c:3};
+  var source1 = { c:4, d:5, e:6};
+  var source2 = { e:7, f:8, g:9};
+  $.extend(target, source1, source2); // 最终target会包含source1和source2的属性,且属性值为最后复制的属性的值.
+```
+9. 在ajax与后台交互的时候，通常需要将传递的参数进行序列化放置乱码.
+```javascript
+  // 语法: $.param(params, traditional) params的值可以为json字符串或者jquery包装集, traditional为可选参数默认为false.
+  $.param({"a thing":'id&s=value', "another thing": 'another value', "weired characters": '*+=='});
+```
+10. 测试一个元素是否包含在另一个元素内部时，就可以使用jQuery提供的`$.contains()`使用函数.
+```javascript
+  // 语法: $.contains(container, containee) 如果container中包含containee则返回true否则为false.
+  $.contains(target, source2);
+```
+11. 对于获取了dom元素引用的情况下，可以使用底层的`$.data()`对元素进行`name`属性进行赋值；也可以通过一个实用的函数来删除name属性.
+```javascript
+  // 语法: $.data(element, name, value) element表示dom元素,name表示元素上的属性名称.
+  $.data(textNode, propertyName, value);
+  // 语法: 将元素的name属性从element元素上进行移除.
+  $.removeData(element, name);
+```
+12. jquery解析`json`字符串，原生的javascript使用`eval()`对json进行解析.
+```javascript
+  // 语法:解析传入的json字符串并返回计算值.
+  $.parseJSON(json);
+```
+
+
+
+
+
 
 
 
