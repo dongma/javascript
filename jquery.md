@@ -70,8 +70,46 @@
   $.parseJSON(json);
 ```
 
-
-
+### jquery发起异步请求ajax的使用.
+ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提供了一组丰富工具集供我们使用。对于加载Html内容到DOM元素，提供了`load()`方法，使用`GET`还是`POST`方法取决于如何提供传递到服务器的参数数据。
+1. 使用`$.load()`从服务器端加载资源内容.
+```javascript
+  // 语法: $.load(url, parameters, callback) parameters可以为字符串或者对象，如果是指定为对象或者数组，则使用POST方法发起请求。如果省略或者指定为字符串则默认使用GET请求.
+  $('.injectMe').load('/jqia2/action/fetchProductDetails', {style: $(event.target).val()}, function() {$('[value=""]', event.target).remove(); });
+```
+2. 如果作为请求发送的数据来自于*表单控件*，则用来帮助创建查询字符串的jQuery方法为`serialize()`；如果想要以JavaScript数组的形式来获取表单数据，则可以使用jQuery的`serializeArray()`方法.
+```javascript
+  // 语法: serialize() 根据包装集中所有成功元素或者包装集表单中所有成功的表单元素，创建正确格式化和编码的查询字符串.
+  var queryString = $('form').serialize();
+  // 使用serializeArray()将查询的表单组件转换为Array.
+  var queryArray = $('form').serializeArray();
+```
+3. 当需要`GET`方法的时候，jQuery提供了实用函数`$.get()`和`$.getJSON()`；如果从服务器端返回JSON数据，那后者会非常有用。为了强制发起`POST`方法，可以使用`$.post()`使用函数。
+```javascript
+  // 语法: $.get(url, parameters, callback, type); callback一个可选的回调函数，在请求成功完成时调用。传入回调函数的第一个参数为响应主体(根据设置的type参数来解析响应主体)，第二个参数是文本信息，第三个参数包含对XHR实例的引用。
+  // type表示如何解析指定的响应主体(html/text/xml/json或者jsonp)
+  $('#bootChooserControl').change(function(event) {
+    $.get('/jqia2/action/fetchProductService', { style: $(event.target).val()},
+    function(response) { $('#productDetailPane').html(response); })
+  });
+```
+4. 使用指定的URL和作为查询字符串的任何传入的参数来向服务器发起`GET`请求。把响应解析为`JSON`字符串，并且把结果数据传递给回调函数。
+```javascript
+  // 语法: $.getJSON(url, parameters, callback) callback函数第一个参数是把响应主体作为JSON表示法解析所得到的数据值。第二个参数是状态文本。第三个参数提供了一个队XHR实例的引用.
+  $.getJSON('/jqia2/action/fetchProductService', {}, function(response) {console.log('返回的json响应结果为: ' + response);})
+```
+5. 使用指定的URL和作为请求主体的任何传入参数来向服务器发起POST请求.
+```javascript
+  // 语法: $.post(url, parameters. callback, type) callback当请求完成时调用的函数。传入回调的第一个参数为响应主体，第二个参数为状态文本，第三个参数提供了对XHR实例的引用。
+  $.post('/jqia2/action/updateProductService', {'productdId': 12344, 'productQuantity': 30}, 
+  function(response) { console.log('请求服务之后返回的结果为: ' + response); }, 'json');
+```
+6. 如果想要控制Ajax请求的各种细节，可以利用jQuery提供的名为`$.ajax()`的通用函数进行调用。jQuery同样也提供了一些用于简化ajax调用的方法，`$.ajaxSetup()`对ajax赋予默认值。
+```javascript
+  // $.ajax(options) 使用传入的选项来发起Ajax请求，以便控制如何创建请求以及如何通知回调.
+  $.ajax({'url': '/jquery/action/getProduct', 'type': 'json', 'success': function(response, status){ console.log('响应的status为:' + status + ' ,返回的响应为: response'); } })
+  $.ajaxSetup(options);
+```
 
 
 

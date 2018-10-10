@@ -1,4 +1,5 @@
 ## Javascript_syntax基本语法(函数、原型继承、Array、正则表达式)
+关于[jQuery常用函数](https://github.com/SamMACode/javascript_syntax/blob/master/jquery.md)用法
 1. javascript语言基本的数据类型以及对象字面量.
 > javascript基本数据类型: 数字、字符串、布尔值`(true & false)`、null值和undefined.其它所有的值都是对象，数字、字符串和布尔值貌似对象，因为它们拥有方法，但是它们是不可变的。javascript中的对象是可变的键控集合(keyed collections)。在javascript中，数组是对象，函数也是对象、正则表达式也是对象，当然，对象也是对象。 
 > 对象字面量：对象字面量是一种非常方便地创建对象值得表示法，一个对象字面量就是包围在一堆花括号中的零个或者多个"名/值"对。
