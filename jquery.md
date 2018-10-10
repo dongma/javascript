@@ -238,7 +238,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
 8. 包裹`wrap(wrapper)`与反包裹`wrapAll(wrapper)`. `wrapInner(wrapper)`或者`unwrap()`删除包装元素的父元素。子元素和其所有的同级节点一起替换了DOM中的父元素.
 ```javascript
   // 用法: 使用html标签或者元素副本将匹配集中的元素包裹起来.
-  $('a.surprise').wrap($('div:first')[0]"));
+  $('a.surprise').wrap($('div:first')[0]));
   // 用法: 使用传入的html标签或者元素副本,将匹配集中的元素作为一个整体包裹起来.
   $('a.surprise').wrapAll($('div:first')[0]);
   // 使用传入的html标签或者元素的副本,将匹配集中的元素content内容包裹起来.
