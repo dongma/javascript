@@ -109,3 +109,8 @@ db.getCollection('record').find({$or: [
         {'sourceData.data.nodes':{$elemMatch:{'properties.invtype':'','properties.invtype_desc':''}}}
     ]
 });
+
+/**
+ * mongodb print all node size(beneficiary record)
+ */
+db.getCollection('record').aggregate([{$project: {nodes: {$size: '$sourceData.data.nodes'}}}]);

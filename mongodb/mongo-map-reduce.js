@@ -89,5 +89,9 @@ var map = function() {
 var reduce = function(key, value) {
     return {'key':key, 'value': value.length };
 };
+
+/*var reduce = function(key, value) {
+    return Array.sum(value);
+};*/
 var options = {out: 'invtypes'};
 db.record.mapReduce(map, reduce, options);
