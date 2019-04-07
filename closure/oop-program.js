@@ -1,10 +1,10 @@
 /**
  * Created by dong on 18/6/3.
  */
-// document.write("<script language='javascript' src='function.js'></script>");
+// document.write("<script language='javascript' src='function-closure.js'></script>");
 // warning:在js中没法引入另外一个Js文件,只能将用到的js代码拷贝过来.
-Function.prototype.method = function(name, func) {
-    if(!this.prototype[name]) {
+Function.prototype.method = function (name, func) {
+    if (!this.prototype[name]) {
         this.prototype[name] = func;
     }
     return this;
@@ -14,13 +14,13 @@ Function.prototype.method = function(name, func) {
  * 1.javascript中的伪类,
  *    定义一个构造器并且扩充其函数的原型.
  * */
-var Mammal = function(name) {
+var Mammal = function (name) {
     this.name = name;
 };
-Mammal.prototype.get_name = function() {
+Mammal.prototype.get_name = function () {
     return this.name;
 };
-Mammal.prototype.says = function() {
+Mammal.prototype.says = function () {
     return this.saying || '';
 };
 // 现在构造一个实例
@@ -29,22 +29,24 @@ var name = myMammal.get_name();
 console.log('myMammal.get_name(): ' + name);
 
 // 2.我们可以构造另一个伪类来继承Mammal,这是通过定义它的constructor函数并替换它的prototype为一个Mammal的实例来实现的.
-var Cat = function(name) {
+var Cat = function (name) {
     this.name = name;
     this.saying = 'meow';
 };
 // 替换Cat.prototype为一个新的Mammal实例.
 Cat.prototype = new Mammal();
 // 扩充新的原型对象,增加purr和get_name方法.
-Cat.prototype.purr = function(n) {
+Cat.prototype.purr = function (n) {
     var i, s = '';
-    for(i=0; i < n; i+=1) {
-        if (s) { s += '-'; }
+    for (i = 0; i < n; i += 1) {
+        if (s) {
+            s += '-';
+        }
         s += 'r';
     }
     return s;
 };
-Cat.prototype.get_name = function() {
+Cat.prototype.get_name = function () {
     return this.says() + ' ' + this.name + ' ' + this.says();
 };
 var myCat = new Cat('Henrietta');
@@ -65,16 +67,16 @@ var Cat = function (name) {
     this.name = name;
     this.saying = 'meow';
 }.inherits(Mammal)
-    .method('purr', function(n) {
+    .method('purr', function (n) {
         var i, s = '';
-        for(i = 0; i < n; i+=1) {
-            if(s) s += '-';
+        for (i = 0; i < n; i += 1) {
+            if (s) s += '-';
             s += 'r';
         }
         return s;
     })
     .method('get_name', function () {
-       return this.says + ' ' + this.name + ' ' + this.says();
+        return this.says + ' ' + this.name + ' ' + this.says();
     });
 
 /**
@@ -83,7 +85,7 @@ var Cat = function (name) {
  * */
 var myMammal = {
     name: 'Herb the Mammal',
-    get_name: function() {
+    get_name: function () {
         return this.name;
     },
     says: function () {
@@ -96,12 +98,12 @@ var myCat = Object.create(myMammal);
 myCat.name = 'Henrietta';
 myCat.saying = 'meow';
 myCat.purr = function () {
-  var i, s= '';
-  for(i = 0; i < n; i++) {
-      if(s) s += '-';
-      s += 'r';
-  }
-  return s;
+    var i, s = '';
+    for (i = 0; i < n; i++) {
+        if (s) s += '-';
+        s += 'r';
+    }
+    return s;
 };
 myCat.get_name = function () {
     return this.says + ' ' + this.name + ' ' + this.says;
@@ -113,7 +115,7 @@ myCat.get_name = function () {
  * */
 var mammal = function (spec) {
     var that = {};
-    that.get_name = function() {
+    that.get_name = function () {
         return spec.name;
     };
     that.says = function () {
@@ -123,18 +125,18 @@ var mammal = function (spec) {
 };
 var myMammal = mammal({name: 'Herb'});
 
-var cat = function(spec) {
+var cat = function (spec) {
     spec.saying = spec.saying || 'meow';
     var that = mammal(spec);
-    that.purr = function(n) {
+    that.purr = function (n) {
         var i, s = '';
-        for(i = 0; i < n; i+=1) {
-            if(s) s += '-';
+        for (i = 0; i < n; i += 1) {
+            if (s) s += '-';
             s += 'r';
         }
         return s;
     };
-    that.get_name = function() {
+    that.get_name = function () {
         return that.says() + ' ' + spec.name + '  ' + that.says();
     };
     return that;
@@ -147,16 +149,16 @@ var myCat = cat({name: 'Henrietta'});
 Object.method('superior', function (name) {
     var that = this,
         method = that[name];
-    return function() {
+    return function () {
         return method.apply(that, arguments);
     };
 });
 // 我们在coolcat上试验一下,coolcat就像cat一样,除了它有一个更酷的调用父类方法的get_name外,
 // 我们会声明一个super_get_name变量并且把调用superior方法所返回的结果赋值给它.
-var coolcat = function(spec) {
+var coolcat = function (spec) {
     var that = cat(spec),
         super_get_name = that.superior('get_name');
-    that.get_name = function(n) {
+    that.get_name = function (n) {
         return 'like ' + super_get_name() + ' baby';
     }
     return that;
@@ -169,35 +171,35 @@ console.log('myCoolCat.get_name: ' + name);
  * */
 var eventuality = function (that) {
     var registry = {};
-    that.fire = function(event) {
+    that.fire = function (event) {
         /**
          * 在一个对象上触发一个事件,该事件可以是一个包含事件名称的字符串,或者是一个拥有包含事件名称的type属性的对象.
          * 通过'on'方法注册的事件处理程序中匹配事件名称中的函数将被调用.
          * */
-      var array, func, handler, i, type = typeof event === 'string' ? event : event.type;
-      // 如果这个事件存在一组事件处理程序,那么就遍历它们并按照顺序依次执行.
-      if(registry.hasOwnProperty(type)) {
-          array = registry[type];
-          for(i = 0; i < array.length; i+=1) {
-              handler = array[i];
-              // 每个处理程序包含一个方法和一组可选的参数,如果该方法是一个字符串形式的名字,那么寻找到该函数.
-              func = handler.method;
-              if(typeof func === 'string') {
-                  func = this[func];
-              }
-              // 调用一个处理程序,如果该条目包含参数,那么传递它们过去,否则,传递该事件对象.
-              func.apply(this, handler.parameterNames || [event]);
-          }
-      }
-      return this;
+        var array, func, handler, i, type = typeof event === 'string' ? event : event.type;
+        // 如果这个事件存在一组事件处理程序,那么就遍历它们并按照顺序依次执行.
+        if (registry.hasOwnProperty(type)) {
+            array = registry[type];
+            for (i = 0; i < array.length; i += 1) {
+                handler = array[i];
+                // 每个处理程序包含一个方法和一组可选的参数,如果该方法是一个字符串形式的名字,那么寻找到该函数.
+                func = handler.method;
+                if (typeof func === 'string') {
+                    func = this[func];
+                }
+                // 调用一个处理程序,如果该条目包含参数,那么传递它们过去,否则,传递该事件对象.
+                func.apply(this, handler.parameterNames || [event]);
+            }
+        }
+        return this;
     };
-    that.on = function(type, method, parameters) {
+    that.on = function (type, method, parameters) {
         // 注册一个事件构造一条处理程序条目,将它插入到处理程序数组中,如果这种类型的事件还不存在,那构造一个.
         var handler = {
             method: method,
             parameters: parameters
         };
-        if(registry.hasOwnProperty(type)) {
+        if (registry.hasOwnProperty(type)) {
             registry[type].push(handler);
         } else {
             registry[type] = [handler];

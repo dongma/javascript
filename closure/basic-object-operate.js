@@ -67,9 +67,10 @@ var a = b = c = {};
 
 // 5.prototype原型属性(每个对象都有一个连接到原型对象),并且它可以从中继承属性.多有对象通过字面量创建的对象都连接到
 // Object.prototype,它是Javascript中的标配对象.给Object对象创建一个create()方法,该方法创建一个使用原型对象作为其原型的新对象.
-if(typeof Object.beget !== 'function') {
-    Object.create = function(o) {
-        var F = function() {};
+if (typeof Object.beget !== 'function') {
+    Object.create = function (o) {
+        var F = function () {
+        };
         F.prototype = o;
         return new F();
     };
@@ -97,14 +98,14 @@ console.log('flight.constructor: ' + flight.hasOwnProperty('constructor'));
 // 如果要列出对象所有的属性则可以使用for.in来进行遍历;在使用for.in对对象属性进行遍历的时候,对象的属性是不确定的.
 // 如果要明确对象属性的值最好使用数组的形式进行表示,对象的属性作为数组的元素通过for循环从中取出元素.
 var name;
-for(name in another_stooge) {
-    if(typeof another_stooge[name] !== 'function') {
+for (name in another_stooge) {
+    if (typeof another_stooge[name] !== 'function') {
         console.log(name + ":" + another_stooge[name]);
     }
 }
 var i;
 var properties = ['first-name', 'middle-name', 'last-name', 'profession'];
-for(i = 0; i < properties.length; i++) {
+for (i = 0; i < properties.length; i++) {
     console.log(properties[i] + ": " + another_stooge[properties[i]]);
 }
 // delete运算符可以删除对象的某属性,如果对象包含有该属性那么该属性就会被移除,它不会触及原型链中的任何对象
@@ -136,4 +137,4 @@ MYAPP.flight = {
         time: "2004-09-22 10:42",
         city: "los angeles"
     }
-}
+};
