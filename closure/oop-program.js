@@ -79,6 +79,11 @@ var Cat = function (name) {
         return this.says + ' ' + this.name + ' ' + this.says();
     });
 
+var inheritsCat = new Cat("Mac OS");
+console.log("inherit object through called method: " + inheritsCat.get_name() + " , get_name: " + inheritsCat.get_name()
+    + " , purr: " + inheritsCat.purr(6));
+
+
 /**
  * 3.原型prototype：在一个纯粹的原型模式中,我们会摒弃类,转而专注于类.基于原型的继承相比较于基于类的继承更容易理解.
  * 你通过构造一个有用的对象开始,接着可以构造更过和那个对象类似的对象.这就可以完全避免把一个应用拆解成一系列嵌套抽象类的分类过程.
@@ -124,7 +129,14 @@ var mammal = function (spec) {
     return that;
 };
 var myMammal = mammal({name: 'Herb'});
+// couldn't access name field directly
+console.log("unaccess private field:" + myMammal.get_name() + " , name:" + myMammal.name);
 
+
+/***
+ * 在函数化模式中,构造器Cat将会调用构造器Mammal,让Mammal去做对象创建中的大部分工作.
+ * 所以Cat只需要关心自身的差异.
+ */
 var cat = function (spec) {
     spec.saying = spec.saying || 'meow';
     var that = mammal(spec);
@@ -142,6 +154,11 @@ var cat = function (spec) {
     return that;
 };
 var myCat = cat({name: 'Henrietta'});
+
+// 直接通过myCat去调用自身的方法myCat.get_name()
+console.log("myCat.get_name: " + myCat.get_name() + " , myCat.says: " + myCat.says());
+
+
 /**
  * 函数化模式还给我们提供了一个处理父类方法的方法,我们会构造一个superior方法,它取得一个方法名并返回
  * 调用那个方法的函数,该函数会调用原来的方法,尽管属性已经变化了.
@@ -153,6 +170,7 @@ Object.method('superior', function (name) {
         return method.apply(that, arguments);
     };
 });
+
 // 我们在coolcat上试验一下,coolcat就像cat一样,除了它有一个更酷的调用父类方法的get_name外,
 // 我们会声明一个super_get_name变量并且把调用superior方法所返回的结果赋值给它.
 var coolcat = function (spec) {
@@ -160,16 +178,19 @@ var coolcat = function (spec) {
         super_get_name = that.superior('get_name');
     that.get_name = function (n) {
         return 'like ' + super_get_name() + ' baby';
-    }
+    };
     return that;
 };
 var myCoolCat = coolcat({name: 'Bix'});
 var name = myCoolCat.get_name();
 console.log('myCoolCat.get_name: ' + name);
+
+
 /**
  * 5.部件part.
  * */
 var eventuality = function (that) {
+    // 创建一个事件注册表对象registry
     var registry = {};
     that.fire = function (event) {
         /**
@@ -182,19 +203,22 @@ var eventuality = function (that) {
             array = registry[type];
             for (i = 0; i < array.length; i += 1) {
                 handler = array[i];
+
                 // 每个处理程序包含一个方法和一组可选的参数,如果该方法是一个字符串形式的名字,那么寻找到该函数.
                 func = handler.method;
                 if (typeof func === 'string') {
                     func = this[func];
                 }
+
                 // 调用一个处理程序,如果该条目包含参数,那么传递它们过去,否则,传递该事件对象.
                 func.apply(this, handler.parameterNames || [event]);
             }
         }
         return this;
     };
+
+    // 注册一个事件构造一条处理程序条目,将它插入到处理程序数组中,如果这种类型的事件还不存在,那构造一个.
     that.on = function (type, method, parameters) {
-        // 注册一个事件构造一条处理程序条目,将它插入到处理程序数组中,如果这种类型的事件还不存在,那构造一个.
         var handler = {
             method: method,
             parameters: parameters
@@ -208,3 +232,8 @@ var eventuality = function (that) {
     };
     return that;
 };
+
+var mammal = new Mammal('herb the Mammal');
+var eventObj = eventuality(mammal);
+// 使用eventObj对mammal进行事件注册
+console.log("eventObj.fire: " + eventObj.fire(null));

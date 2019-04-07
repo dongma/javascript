@@ -1,7 +1,8 @@
 /**
  * Created by dong on 18/6/1.
  */
-var value = 86;     // 定义全局的value变量.
+// 定义全局的value变量.
+var value = 86;
 // 1.声明函数字面量与myobject对象(方法调用模式).
 var add = function (a, b) {
     return a + b;
@@ -94,17 +95,6 @@ Function.prototype.method = function (name, func) {
     }
     return this;
 };
-Function.method('curry', function () {
-    var slice = Array.prototype.slice,
-        args = slice.apply(arguments),
-        that = this;
-    return function () {
-        return that.apply(null, args.concat(slice.apply(arguments)));
-    };
-});
-var addCurryFunc = add.curry(1);
-// 在curry柯里化函数中多余的参数会被忽略.
-console.log("CurryFunc: " + addCurryFunc(2));
 
 /**
  * 5.记忆(memoization).我们在一个名为memo的数组里面存放我们的存储结果,存储结果可以隐藏在闭包中.
@@ -125,3 +115,101 @@ var fibonacci = function () {
 for (var i = 0; i <= 10; i++) {
     console.log("fibonacci[" + i + "] " + fibonacci(i));
 }
+
+/**
+ * 6.Javascript Closure function:
+ * 对于Javascript中关系闭包的理解为：函数与其创建的下文关系进行绑定
+ * */
+var myClosureObject = (function () {
+    var value = 0;
+
+    // 返回给myClosureObject的是匿名函数调用后的结果，该对象包括两个方法{increment, getValue}可以
+    // 调用数据. 而value属性则是private私有的,通过外部的myClosureObject无法访问内容数据.
+    return {
+        increment: function (inc) {
+            value += typeof inc === 'number' ? inc : 1;
+        },
+        getValue: function () {
+            return value;
+        }
+    }
+} ());
+
+// 通过myClosureObject直接访问其value属性,应该会返回"undefined"
+console.log('Access value filed through myClosureObject, myClosureObject.value: ' + myClosureObject.value);
+
+myClosureObject.increment(2);
+console.log('Access value field by calling myClosureObject.getValue(): ' + myClosureObject.getValue());
+
+// 构造一个名为quo的构造函数,它构造出带有get_status方法和status私有属性的一个对象
+var quoFunction = function (status) {
+    return {
+        get_status: function () {
+            return status;
+        }
+    };
+};
+// 构造一个quoFunction对象,通过返回的myQuo对象直接访问其status会直接返回null.
+var myQuo = quoFunction("amazed");
+// 即使myQuo已经返回,但是get_status方法仍然享有访问quo对象的status属性的特权.get_status方法并不是访问访问该参数的一个复本,
+// 它访问的就是该参数本身.因为该函数可以访问它被创建时所处的上下文环境,这被称为闭包.
+console.log("myQuo.get_status: " + myQuo.get_status() + " , directed access field: " + myQuo.status);
+
+/**
+ * Javascript的Module（模块）,可以使用函数和闭包来构造模块.模块是一个提供接口却隐藏状态与实现的函数或对象.
+ *  通过使用函数产生模块,我们几乎可以完全摒弃全局变量的使用,从而缓解这个Javascript的最为糟糕的特性之一所带来的影响.
+ * */
+
+var serial_maker = function () {
+
+    /**
+     * 返回一个用来产生唯一字符串的对象,唯一字符串由prefix和seq组成. 该对象返回一个设置前缀的方法，一个设置序列号的方法.
+     * 和一个产生唯一字符串gensym方法.
+     * */
+    var prefixField = '';
+    var seq = 0;
+    return {
+        set_prefix: function (prefix) {
+            prefixField = String(prefix);
+        },
+        set_seq: function (serial) {
+            seq = serial;
+        },
+        gensym: function () {
+            var result = prefixField + seq;
+            seq += 1;
+            return result;
+        }
+    };
+};
+
+var senqer = serial_maker();
+senqer.set_prefix('Q');
+senqer.set_seq(1000);
+// 根据字符前缀和序列号sequence产生唯一标识符, 并不能通过senqer访问prefixField属性
+var identify = senqer.gensym();
+console.log("unique identify: " + identify + " , unresolved serial_maker.prefixField.");
+
+/**
+ * 函数的curry科里化：
+ *  函数的科里化允许我们把函数与传递给它的参数结合起来,产生一个新的函数。
+ * */
+
+Function.method('curry', function () {
+    var slice = Array.prototype.slice,
+        args = slice.apply(arguments),
+        that = this;
+    return function () {
+        return that.apply(null, args.concat(slice.apply(arguments)));
+    };
+});
+
+var addCurry = add.curry(1);
+console.log("add function curry result: " + addCurry(6));
+
+var statusObject = {
+    "status": "apply method"
+};
+// 对Javascript中apply方式调用方法进行尝试
+var result = Quo.prototype.get_status.apply(statusObject);
+console.log("apply method called: " + result);
