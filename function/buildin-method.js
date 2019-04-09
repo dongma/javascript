@@ -63,7 +63,7 @@ arrayItem.sort(function (a, b) {
 console.log("Use custom array compare: [" + arrayItem + "]");
 // 如果对array中的所有元素进行排序,但其不能使字符串排序. 如果我们想要给任何包含简单值的数组排序,必须要做更多的工作.
 var variousItem = ["aa", "bb", "a", 4, 8, 15, 16, 23, 42];
-variousItem.sort(function(prev, next) {
+variousItem.sort(function (prev, next) {
     if (prev === next) {
         return 0;
     }
@@ -74,4 +74,129 @@ variousItem.sort(function(prev, next) {
 });
 console.log("various item sort: [" + variousItem + "]");
 
+// 可以对象数组进行排序,使用对象的某个属性对其进行排序.
+var sortedBy = function (name) {
+    return function (prev, next) {
+        // 如果prev和Next对象都为object类型,并且prev和next对象都非undefined
+        if (typeof prev === 'object' && typeof next === 'object' && prev && next) {
+            var prevValue = prev[name];
+            var nextValue = next[name];
+
+            if (prevValue === nextValue) {
+                return 0;
+            }
+            // 如果属性值类型相同,则根据属性名称比较属性的值.
+            if (typeof prevValue === typeof nextValue) {
+                return prevValue < nextValue ? -1 : 1;
+            }
+            return typeof prevValue < typeof nextValue ? -1 : 1;
+        } else {
+            throw {
+                name: 'Error',
+                message: 'Expected an object when sorting by ' + name
+            };
+        }
+    };
+};
+
+var objectArray = [
+    {first: 'Joe', last: 'Besser'},
+    {first: 'Moe', last: 'Howard'},
+    {first: 'Joe', last: 'DeRita'},
+    {first: 'Shemp', last: 'Howard'},
+    {first: 'Larry', last: 'Fine'},
+    {first: 'Curly', last: 'Howard'}
+];
+
+// 排序的稳定性是指:排序后数组中的相等值的相对位置没有发生改变,而不稳定行排序则会改变相等值的相对位置.
+objectArray.sort(sortedBy("first")).sort(sortedBy("last"));
+console.log("Sorted object array by first field, objectArray: [" + objectArray + "]");
+
+// by函数接受一个成员名字符串和一个可选的次要比较函数作为参数,并返回一个可以用来对包含该成员的对象数组进行排序的比较函数.
+// 当prev[name]和next[name]相等时,次要比较函数被用来表决高下.
+var stableSortedBy = function (name, minor) {
+    return function (prev, next) {
+        if (prev && next && typeof prev === 'object' && typeof next === 'object') {
+            var prevValue = prev[name];
+            var nextValue = next[name];
+
+            if (prevValue === nextValue) {
+                return typeof minor === 'function' ? minor(prev, next) : 0;
+            }
+            if (typeof prevValue === typeof nextValue) {
+                return prevValue < nextValue ? -1 : 1;
+            }
+            return typeof prevValue < typeof nextValue ? -1 : 1;
+        } else {
+            throw {
+                name: 'Error',
+                message: 'Expected an object when sorting by ' + name
+            };
+        }
+    };
+};
+
+objectArray.sort(stableSortedBy('last', stableSortedBy('first')));
+console.log("stableSortedBy array: [" + objectArray + "]");
+
+/***
+ * Array.splice(start, deleteCount, item...)
+ * Array的slice方法会从start位置开始删除deleteCount的元素,同时使用item..数组中的元素对其进行替换.
+ */
+var sliceArray = ["a", "b", "c"];
+var removeItem = sliceArray.splice(1, 1, "ache", "bug");
+console.log("slice method result array: [" + sliceArray + "], remove Item: [" + removeItem + "]");
+
+// Array.splice() method方法实现
+Array.method('splice', function (start, deleteCount) {
+    var max = Math.max,
+        min = Math.min,
+        delta,
+        element,
+        insertCount = max(arguments.length - 2, 0),
+        k = 0,
+        len = this.length,
+        new_len,
+        result = [],
+        shift_count;
+
+    start = start || 0;
+    if (start < 0) {
+        start += len;
+    }
+    start = max(min(start, len), 0);
+    deleteCount = max(min(typeof deleteCount === 'number' ? deleteCount : len, len - start), 0);
+    delta = insertCount - deleteCount;
+    while (k < deleteCount) {
+        element = this[start + k];
+        if (element !== undefined) {
+            result[k] = element;
+        }
+        k += 1;
+    }
+
+    shift_count = len - start - deleteCount;
+    if (delta < 0) {
+        k = start + insertCount;
+        while (shift_count) {
+            this[k] = this[k - delta];
+            k += 1;
+            shift_count -= 1;
+        }
+        this.length -= 1;
+    } else if (delta > 0) {
+        k += 1;
+        while (shift_count) {
+            this[new_len - k] = this[len - k];
+            k += 1;
+            shift_count -= 1;
+        }
+        this.length = new_len;
+    }
+
+    for (k = 0; k < insertCount; k += 1) {
+        this[start + k] = arguments[k + 2];
+    }
+    return result;
+});
 
