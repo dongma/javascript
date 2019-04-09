@@ -43,7 +43,7 @@ console.log("reverse array: [" + reverseArray + "]");
 // array.shift()方法会移除array中第1个元素并返回该元素,如果这个数组为空的则会返回undefined,shift通常比pop慢得多.
 var shiftArray = ["a", "b", "c"];
 var shiftChar = shiftArray.shift();
-console.log("shiftArray.shift method, shiftChar: [" + shiftChar + "], shiftArray: [" + shiftArray + "]");
+console.log("shiftArray.shift method, shiftChar: [" + shiftChar + "], unshiftArray: [" + shiftArray + "]");
 
 // slice方法会对array中的一段做浅复制,首先复制array[start],一致复制到array[end]为止.
 var sliceArray = ["a", "b", "c"];
@@ -153,20 +153,27 @@ Array.method('splice', function (start, deleteCount) {
         min = Math.min,
         delta,
         element,
+        // 通过arguments.length计算本次插入元素的数量.
         insertCount = max(arguments.length - 2, 0),
         k = 0,
+        // len当前数组的长度,new_len表示replace元素之后的数组长度.
         len = this.length,
         new_len,
         result = [],
         shift_count;
 
+    // 判断是否指定了start元素,如果未指定则默认从0位置开始.
     start = start || 0;
     if (start < 0) {
         start += len;
     }
     start = max(min(start, len), 0);
+    // 用于计算从start位置开始需要移除元素的个数.
     deleteCount = max(min(typeof deleteCount === 'number' ? deleteCount : len, len - start), 0);
     delta = insertCount - deleteCount;
+    // delta的数值为本次新增元素的个数,将其加上length构成新的数组长度.
+    new_len = len + delta;
+
     while (k < deleteCount) {
         element = this[start + k];
         if (element !== undefined) {
@@ -183,7 +190,7 @@ Array.method('splice', function (start, deleteCount) {
             k += 1;
             shift_count -= 1;
         }
-        this.length -= 1;
+        this.length = new_len;
     } else if (delta > 0) {
         k += 1;
         while (shift_count) {
@@ -199,4 +206,20 @@ Array.method('splice', function (start, deleteCount) {
     }
     return result;
 });
+
+
+/**
+ * array.unshift() method功能和push方法类似,用于把元素添加到数组中,其会将Item添加到数组的头部而不是尾部。
+ * */
+var unshiftArray = ["a", "b", "c"];
+var length = unshiftArray.unshift("?", "@");
+console.log("unshift array is: [" + unshiftArray + "], result.length: [" + length + "]");
+// Array.shift()函数的实现逻辑如下
+/*Array.method("unshift", function () {
+    this.splice.apply(this,
+        // this.splice方法参数含义:从位置为0的位置(start),移除0个元素并且用arguments数组进行补充.
+        [0, 0].concat(Array.prototype.slice.apply(arguments)));
+    return this.length;
+});*/
+
 
