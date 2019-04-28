@@ -7,7 +7,13 @@ var map = function () {
     var companyName = this.companyName;
 
     // 2.获取受益人(full-data-branch)中受益人结点[人员节点type=2]
-    var nodesList = this.data.nodes;
+    var nodesList;
+    if (this.data == undefined) {
+        return;
+    } else {
+        nodesList = this.data.nodes;
+    }
+
     for (var i = 0; i < nodesList.length; i++) {
         // 对于最终结果只需要人员节点[PERSON = 2]
         if (nodesList[i].type !== 2) {
@@ -20,9 +26,9 @@ var map = function () {
             // 获取受益人的cgzb属性值,并将其中大于30%的数据进行emit
             if (properties['cgzb'] !== undefined && properties['cgzb'].trim() !== '') {
                 var cgzbValue = parseFloat(properties['cgzb']);
-                if (cgzbValue >= 30) {
-                    // 获取人员的个人标识码(唯一标识)作为分组标识
-                    var palgorithmid = properties['palgorithmid'];
+                // 获取人员的个人标识码(唯一标识)作为分组标识
+                var palgorithmid = properties['palgorithmid'];
+                if (cgzbValue >= 30 && palgorithmid !== undefined) {
                     // 组装要进行emit的数据,其中包括{companyId, companyName, palgorithmid, personName}
                     var item = {
                         "palgorithmid": palgorithmid,
