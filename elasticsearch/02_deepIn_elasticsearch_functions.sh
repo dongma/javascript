@@ -720,4 +720,5 @@ curl 'localhost:9200/get-together/group/1?pretty'
   }
 }
 
-
+# 10.查看集群中节点的状态(Elasticsearch的Api)
+curl 'localhost:9200/_cat/shards?v'
