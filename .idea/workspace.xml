@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c367e7c7-69ed-4e8a-9135-f31655c3764e" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/elasticsearch/04_query_data_from_elasticsearch.sh" afterPath="$PROJECT_DIR$/elasticsearch/04_query_data_from_elasticsearch.sh" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -19,7 +20,7 @@
       <file leaf-file-name="03_elasticsearch_basic_operate.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/elasticsearch/03_elasticsearch_basic_operate.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
+            <state relative-caret-position="2552">
               <caret line="116" column="0" lean-forward="false" selection-start-line="116" selection-start-column="0" selection-end-line="125" selection-end-column="2" />
               <folding />
             </state>
@@ -29,8 +30,8 @@
       <file leaf-file-name="04_query_data_from_elasticsearch.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/elasticsearch/04_query_data_from_elasticsearch.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6138">
-              <caret line="279" column="52" lean-forward="true" selection-start-line="279" selection-start-column="52" selection-end-line="279" selection-end-column="52" />
+            <state relative-caret-position="14630">
+              <caret line="665" column="12" lean-forward="true" selection-start-line="665" selection-start-column="12" selection-end-line="665" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -49,6 +50,7 @@
     <findStrings>
       <find>quo</find>
       <find>curl -h</find>
+      <find>size</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -124,6 +126,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -132,16 +135,10 @@
               <item name="Javascript" type="b2602c69:ProjectViewProjectNode" />
               <item name="Javascript" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Javascript" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Javascript" type="462c0819:PsiDirectoryNode" />
-              <item name="elasticsearch" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -239,11 +236,13 @@
       <workItem from="1561860046152" duration="7766000" />
       <workItem from="1561889913896" duration="9705000" />
       <workItem from="1561995353381" duration="8199000" />
+      <workItem from="1562032751009" duration="3000" />
+      <workItem from="1562082094104" duration="8218000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="124022000" />
+    <option name="totallyTimeSpent" value="132243000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -664,7 +663,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/elasticsearch/03_elasticsearch_basic_operate.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
+        <state relative-caret-position="2552">
           <caret line="116" column="0" lean-forward="false" selection-start-line="116" selection-start-column="0" selection-end-line="125" selection-end-column="2" />
           <folding />
         </state>
@@ -672,8 +671,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/elasticsearch/04_query_data_from_elasticsearch.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6138">
-          <caret line="279" column="52" lean-forward="true" selection-start-line="279" selection-start-column="52" selection-end-line="279" selection-end-column="52" />
+        <state relative-caret-position="14630">
+          <caret line="665" column="12" lean-forward="true" selection-start-line="665" selection-start-column="12" selection-end-line="665" selection-end-column="12" />
           <folding />
         </state>
       </provider>

@@ -251,7 +251,7 @@ curl -H "Content-Type:application/json" -XPUT 'localhost:9200/get-together/_mapp
 
 {"acknowledged":true}
 
-# 6.使用查询和过滤器dsl,最基础的match查询和term过滤器
+# 6.使用查询和过滤器dsl,最基础的match查询和term过滤器(在评分机制和搜索行为的性能上有所不同,不像查询会为特定的词条计算得分)
 curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search' -d '{
     "query": {
         "match": {
@@ -279,4 +279,407 @@ curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_sear
   "members": ["Lee", "Igor"],
   "location_group": "San Francisco, California, USA"
 }}]}}
+
+
+# 7.过滤器可以比普通的查询更快,而且还可以被缓存,使用过滤器的搜索和使用查询的普通搜索是非常相似的,但需要将查询替换为"filtered"映射
+# 在elasticsearch 5.x中filtered过滤器已经被禁用,需使用bool/must/filter进行替换.
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {
+                    "name": "elasticsearch"
+                }
+            },
+            "filter": {
+                "match": {
+                    "organizer": "Lee"
+                }
+            }
+        }
+    }
+}'
+
+# warning:在elasticsearch中term与match的区别:在查询中term是精确查询、match是模糊查询(term表示完全匹配,也就是精确匹配.
+# 搜索前不会再对搜索词进行分词);
+# 而match类查询会先对搜索词进行分词,对于基本的Match搜索来说,只要搜索到分词集合中的一个或者多个存在于文档中即可.
+{
+  "took" : 20,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 0.87138504,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 0.87138504,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "organizer" : "Lee",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!",
+          "created_on" : "2013-03-15",
+          "tags" : [
+            "denver",
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "solr"
+          ],
+          "members" : [
+            "Lee",
+            "Mike"
+          ],
+          "location_group" : "Denver, Colorado, USA"
+        }
+      }
+    ]
+  }
+}
+
+# term级别查询将按照存储在倒排索引中确切字词进行操作,这些查询通常用于数字、日期和枚举等结构化数据,而不是全文本字段.
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {
+                    "name": "elasticsearch"
+                }
+            },
+            "filter": {
+                "term": {
+                    "created_on": "2012-08-07"
+                }
+            }
+        }
+    }
+}'
+
+{
+  "took" : 3,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 0.2876821,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "Elasticsearch San Francisco",
+          "organizer" : "Mik",
+          "description" : "Elasticsearch group for ES users of all knowledge levels",
+          "created_on" : "2012-08-07",
+          "tags" : [
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "open source"
+          ],
+          "members" : [
+            "Lee",
+            "Igor"
+          ],
+          "location_group" : "San Francisco, California, USA"
+        }
+      }
+    ]
+  }
+}
+
+
+# 8. elasticsearch中常用的基础查询和过滤器:对于match_all查询,它会匹配所有的文档.主要应用场景:希望使用过滤器(可能完全不关心文档得分)
+# 或者是希望返回被搜索的索引和类型中的全部文档(使用match_all会返回get-together索引下group类型的全部文档).
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match_all": {}
+    }
+}'
+
+# 使用match_all中的过滤器查询,在搜索中使用过滤器,而不是普通的查询.
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match_all": {}
+            },
+            "filter": {
+                "term": {
+                    "created_on": "2012-08-07"
+                }
+            }
+        }
+    }
+}'
+
+{
+  "took" : 3,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Elasticsearch San Francisco",
+          "organizer" : "Mik",
+          "description" : "Elasticsearch group for ES users of all knowledge levels",
+          "created_on" : "2012-08-07",
+          "tags" : [
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "open source"
+          ],
+          "members" : [
+            "Lee",
+            "Igor"
+          ],
+          "location_group" : "San Francisco, California, USA"
+        }
+      }
+    ]
+  }
+}
+
+# query_string查询:一个query_string查询既可以通过URL来执行也可以通过请求主体来发送.
+curl -XGET 'localhost:9200/get-together/group/_search?q=2013-03-15&pretty'
+
+{
+  "took" : 4,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "organizer" : "Lee",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!",
+          "created_on" : "2013-03-15",
+          "tags" : [
+            "denver",
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "solr"
+          ],
+          "members" : [
+            "Lee",
+            "Mike"
+          ],
+          "location_group" : "Denver, Colorado, USA"
+        }
+      }
+    ]
+  }
+}
+
+# 通过请求主体查询created_on的日期为"2013-03-15"中符合条件的记录(在query_string中指定默认的搜索字段).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "query_string": {
+            "query": "2013-03-15",
+            "default_field": "created_on"
+        }
+    }
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "organizer" : "Lee",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!",
+          "created_on" : "2013-03-15",
+          "tags" : [
+            "denver",
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "solr"
+          ],
+          "members" : [
+            "Lee",
+            "Mike"
+          ],
+          "location_group" : "Denver, Colorado, USA"
+        }
+      }
+    ]
+  }
+}
+
+# 使用term查询和term过滤器(其可以让你指定需要搜索的文档字段和词条)
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "term": {
+            "name": "elasticsearch"
+        }
+    },
+    "size": 1
+}'
+
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 0.87138504,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 0.87138504,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "organizer" : "Lee",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!",
+          "created_on" : "2013-03-15",
+          "tags" : [
+            "denver",
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "solr"
+          ],
+          "members" : [
+            "Lee",
+            "Mike"
+          ],
+          "location_group" : "Denver, Colorado, USA"
+        }
+      }
+    ]
+  }
+}
+
+# 与term查询相类似,还可以使用term过滤器来限制结果文档.使其包含特定的词条,不过无需计算得分(使用term filter后文档得分是常数1.0).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match_all": {}
+            },
+            "filter": {
+                "term": {
+                    "organizer": "lee"
+                }
+            }
+        }
+    },
+    "size": 1
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "organizer" : "Lee",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!",
+          "created_on" : "2013-03-15",
+          "tags" : [
+            "denver",
+            "elasticsearch",
+            "big data",
+            "lucene",
+            "solr"
+          ],
+          "members" : [
+            "Lee",
+            "Mike"
+          ],
+          "location_group" : "Denver, Colorado, USA"
+        }
+      }
+    ]
+  }
+}
+
+# terms查询:和term查询类似,terms查询可以搜索某个文档字段中锁哥词条(例如搜索了标签含有jvm和hadoop的分组)
+# 目前在terms查询中暂时不支持minimum_should_match配置.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "terms": {
+            "members": ["Lee", "Daniel", "Mike", "Igor"],
+            "minimum_should_match": 2
+        }
+    },
+    "_source": ["name", "members"]
+}'
 
