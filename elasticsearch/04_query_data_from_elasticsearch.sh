@@ -683,3 +683,165 @@ curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/grou
     "_source": ["name", "members"]
 }'
 
+
+# 9.match查询和term过滤器: 和term查询类似,match查询时一个散列映射,包含了希望搜索的字符串(返回字段列表["name", "organizer"]).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match": {
+            "name": "elasticsearch"
+        }
+    },
+    "size": 1,
+    "_source": ["name", "organizer"]
+}'
+
+{
+  "took" : 4,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 0.87138504,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 0.87138504,
+        "_source" : {
+          "organizer" : "Lee",
+          "name" : "Elasticsearch Denver"
+        }
+      }
+    ]
+  }
+}
+
+
+# 默认情况下,match查询使用布尔行为和OR操作符,对于搜索"elasticsearch denver"词条,其会将elasticsearch和denver词条分开,
+# 使用它分别进行搜索匹配的记录(使用And操作符其会将匹配的词拼接起来).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match": {
+            "name": {
+                "query": "elasticsearch denver",
+                "operator": "and"
+            }
+        }
+    },
+    "_source": ["name", "organizer"]
+}'
+
+{
+  "took" : 15,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.1005893,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.1005893,
+        "_source" : {
+          "organizer" : "Lee",
+          "name" : "Elasticsearch Denver"
+        }
+      }
+    ]
+  }
+}
+
+# 词组查询行为(pharse):phrase查询时非常有用的,每个单词的位置之间可以留有余地(slop),用于标识词组中多个分词之间的距离.
+# 在elasticsearch 6.x版本已经不再支持"match"中使用"type"类型,可以使用"match_phrase"进行替换.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match_phrase": {
+            "name": {
+                "query": "enterprise london",
+                "slop": 1
+            }
+        }
+    },
+    "_source": ["name", "description"]
+}'
+
+{
+  "took" : 16,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 0.37229446,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "5",
+        "_score" : 0.37229446,
+        "_source" : {
+          "name" : "Enterprise search London get-together",
+          "description" : "Enterprise search get-togethers are an opportunity to get together with other people doing search."
+        }
+      }
+    ]
+  }
+}
+
+
+# 使用phrase_prefix查询搜索词组,不过它是和词组中最后一个词条进行前缀匹配(对于提供搜索框中自动完成功能而言,这个行为是非常有用的).
+# 可以使用max_expansions来设置最大的前缀扩展数量,这样就可以在合理的时间范围内返回搜索的结果(phrase查询对于接受用户输入来说是很好的选择).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match_phrase_prefix": {
+            "name": {
+                "query": "Elasticsearch den",
+                "max_expansions": 1
+            }
+        }
+    },
+    "_source": ["name"]
+}'
+
+{
+  "took" : 26,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 2.2011786,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 2.2011786,
+        "_source" : {
+          "name" : "Elasticsearch Denver"
+        }
+      }
+    ]
+  }
+}
