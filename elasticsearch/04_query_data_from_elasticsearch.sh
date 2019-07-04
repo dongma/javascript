@@ -845,3 +845,323 @@ curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/grou
     ]
   }
 }
+
+
+# multi_match查询和搜索单字段中多个匹配的词条查询,它们的行为表现会非常相像(在文档中搜索name和description字段).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "multi_match": {
+            "query": "Elasticsearch hadoop",
+            "fields": ["name", "description"]
+        }
+    },
+    "_source": ["name", "description"]
+}'
+
+{
+  "took" : 74,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 0.87138504,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 0.87138504,
+        "_source" : {
+          "name" : "Elasticsearch Denver",
+          "description" : "Get together to learn more about using Elasticsearch, the applications and neat things you can do with ES!"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "Elasticsearch San Francisco",
+          "description" : "Elasticsearch group for ES users of all knowledge levels"
+        }
+      }
+    ]
+  }
+}
+
+
+# 10.bool查询允许在单独的查询中组合任意数量的查询,执行的查询子句表明哪些部分是必须(must)匹配、应该匹配(should)、不能匹配(must_not).
+# 对于符合should筛选条件可以使用("minimum_should_match":1)进行判定.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "term": {
+                        "organizer": "tyler"
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "term": {
+                        "organizer": "client"
+                    }
+                },
+                {
+                    "term": {
+                        "organizer": "andy"
+                    }
+                }
+            ],
+            "must_not": [
+                {
+                    "range": {
+                        "created_on": {
+                            "lt": "2005-11-25"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 0.2876821,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "5",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "Enterprise search London get-together",
+          "organizer" : "Tyler",
+          "description" : "Enterprise search get-togethers are an opportunity to get together with other people doing search.",
+          "created_on" : "2009-11-25",
+          "tags" : [
+            "enterprise search",
+            "apache lucene",
+            "solr",
+            "open source",
+            "text analytics"
+          ],
+          "members" : [
+            "Clint",
+            "James"
+          ],
+          "location_group" : "London, England, UK"
+        }
+      }
+    ]
+  }
+}
+
+# 11.bool查询过滤器版本和查询版本基本一致,只是它组合的是过滤器而不是查询.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "term": {
+                        "organizer": "tyler"
+                    }
+                },
+                {
+                    "range": {
+                        "created_on": {
+                            "gte": "2005-11-25"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}'
+
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.287682,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "5",
+        "_score" : 1.287682,
+        "_source" : {
+          "name" : "Enterprise search London get-together",
+          "organizer" : "Tyler",
+          "description" : "Enterprise search get-togethers are an opportunity to get together with other people doing search.",
+          "created_on" : "2009-11-25",
+          "tags" : [
+            "enterprise search",
+            "apache lucene",
+            "solr",
+            "open source",
+            "text analytics"
+          ],
+          "members" : [
+            "Clint",
+            "James"
+          ],
+          "location_group" : "London, England, UK"
+        }
+      }
+    ]
+  }
+}
+
+
+# 12.range查询和range过滤器(使用range查询查找created_on在"2012-06-01“~"2016-09-01")的文档
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "range": {
+            "created_on": {
+                "gt": "2012-06-01",
+                "lt": "2016-09-01"
+            }
+        }
+    },
+    "_source": ["created_on", "name"]
+}'
+
+{
+  "took" : 21,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2013-03-15",
+          "name" : "Elasticsearch Denver"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2012-06-15",
+          "name" : "Denver Clojure"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2012-08-07",
+          "name" : "Elasticsearch San Francisco"
+        }
+      }
+    ]
+  }
+}
+
+# 使用filter的range过滤器,查找文档创建时间在(2012-06-01~2016-09-01)的所有文档.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match_all": {}
+            },
+            "filter": {
+                "range": {
+                    "created_on": {
+                        "gt": "2012-06-01",
+                        "lt": "2016-09-01"
+                    }
+                }
+            }
+        }
+    },
+    "_source": ["name", "created_on"]
+}'
+
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2013-03-15",
+          "name" : "Elasticsearch Denver"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2012-06-15",
+          "name" : "Denver Clojure"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "created_on" : "2012-08-07",
+          "name" : "Elasticsearch San Francisco"
+        }
+      }
+    ]
+  }
+}
+
