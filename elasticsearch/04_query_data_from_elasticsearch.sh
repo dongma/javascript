@@ -1165,3 +1165,271 @@ curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/grou
   }
 }
 
+
+# prefix查询和过滤器,和term查询类似:prefix查询和过滤器允许你根据指定的前缀搜索词条
+# (对于event-index的索引,匹配所有以liber开头的文档).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "query": {
+        "prefix": {
+            "title": "liber"
+        }
+    }
+}'
+
+# 使用event-index索引过滤器进行检索文档(使用bool/must/filter组合检索文档).
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match_all": {}
+            },
+            "filter": {
+                "prefix": {
+                    "title": "liber"
+                }
+            }
+        }
+    }
+}'
+
+{
+  "took" : 14,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "100",
+        "_score" : 1.0,
+        "_source" : {
+          "host" : [
+            "Lee",
+            "Troy"
+          ],
+          "title" : "Liberator and Immutant",
+          "description" : "We will discuss two different frameworks in Clojure for doing different things. Liberator is a ring-compatible web framework based on Erlang Webmachine. Immutant is an all-in-one enterprise application based on JBoss.",
+          "attendees" : [
+            "Lee",
+            "Troy",
+            "Daniel",
+            "Tom"
+          ],
+          "date" : "2013-09-05T18:00",
+          "location_event" : {
+            "name" : "Stoneys Full Steam Tavern",
+            "geolocation" : "39.752337,-105.00083"
+          },
+          "reviews" : 4
+        }
+      }
+    ]
+  }
+}
+
+
+# 使用elsticsearch中的wildcard通配符查询(创建新类型的索引,然后使用wildcard查询文档).
+curl -XPUT 'localhost:9200/wildcard-test'
+{"acknowledged":true,"shards_acknowledged":true,"index":"wildcard-test"}
+
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/wildcard-test/doc/1' -d '{
+    "title": "The Best Bacon Ever"
+}'
+{"_index":"wildcard-test","_type":"doc","_id":"1","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":0,"_primary_term":1}
+
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/wildcard-test/doc/2' -d '{
+    "title": "How to raise a barn"
+}'
+{"_index":"wildcard-test","_type":"doc","_id":"1","_version":2,"result":"updated","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1,"_primary_term":1}
+
+# 分别使用*和?通配符匹配文档内容.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/wildcard-test/doc/_search?pretty' -d '{
+    "query": {
+        "wildcard": {
+            "title": {
+                "wildcard": "ba*n"
+            }
+        }
+    }
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "wildcard-test",
+        "_type" : "doc",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "title" : "How to raise a barn"
+        }
+      },
+      {
+        "_index" : "wildcard-test",
+        "_type" : "doc",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "title" : "The Best Bacon Ever"
+        }
+      }
+    ]
+  }
+}
+
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/wildcard-test/doc/_search?pretty' -d '{
+    "query": {
+        "wildcard": {
+            "title": {
+                "wildcard": "ba?n"
+            }
+        }
+    }
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "wildcard-test",
+        "_type" : "doc",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "title" : "How to raise a barn"
+        }
+      }
+    ]
+  }
+}
+
+# 13.使用过滤器查询字段的存在性,exist过滤器可以用于查找缺乏某个字段或者确实某个字段值的全部文档.
+# 也可以使用missing过滤器进行筛选文档内容(缺失某个字段或者字段值为null的记录),可以使用_cache选项缓存过滤器查询后的结果.
+curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/_search?pretty' -d '{
+    "query": {
+        "bool": {
+            "must": {
+                "match_all": {}
+            },
+            "filter": {
+                "exists": {"field": "location_group"}
+            }
+        }
+    },
+    "_source": ["location_group", "name"]
+}'
+
+{
+  "took" : 6,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "5",
+        "_score" : 1.0,
+        "_source" : {
+          "location_group" : "London, England, UK",
+          "name" : "Enterprise search London get-together"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "location_group" : "Denver, Colorado, USA",
+          "name" : "Elasticsearch Denver"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "4",
+        "_score" : 1.0,
+        "_source" : {
+          "location_group" : "Boulder, Colorado, USA",
+          "name" : "Boulder/Denver big data get-together"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "location_group" : "Denver, Colorado, USA",
+          "name" : "Denver Clojure"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "location_group" : "San Francisco, California, USA",
+          "name" : "Elasticsearch San Francisco"
+        }
+      }
+    ]
+  }
+}
+
+# 在elasticsearch 6.x中对filter查询结果进行cache(仍待研究).
+#curl -H "Content-Type:application/json" -XPOST 'localhost:9200/get-together/_search?pretty' -d '{
+#    "query": {
+#        "bool": {
+#            "must": {
+#                "match_all": {}
+#            },
+#            "filter": {
+#                "query_string": {
+#                    "name": "denver clojure"
+#                },
+#                "_cache": true
+#            }
+#        }
+#    },
+#    "_source": ["location_group", "name"]
+#}'
+
