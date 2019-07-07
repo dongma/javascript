@@ -685,3 +685,621 @@ curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_sear
   }
 }
 
+# 返回只包含search的词条创建桶,在进行检索的organizer字段中,对包含有search字段的文档进行分组(其中依据字段为name).
+# 对name值中包含有search部分的文档进行分组,创建Bucket对象.
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "aggregations": {
+        "tags": {
+            "terms": {
+                "field": "name",
+                "include": ".*search.*",
+                "order": {
+                    "_term": "asc"
+                }
+            }
+        }
+    },
+    "_source": ["name", "organizer"]
+}'
+
+{
+  "took" : 10,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "5",
+        "_score" : 1.0,
+        "_source" : {
+          "organizer" : "Tyler",
+          "name" : "Enterprise search London get-together"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "organizer" : "Lee",
+          "name" : "Elasticsearch Denver"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "4",
+        "_score" : 1.0,
+        "_source" : {
+          "organizer" : "Andy",
+          "name" : "Boulder/Denver big data get-together"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "organizer" : [
+            "Daniel",
+            "Lee"
+          ],
+          "name" : "Denver Clojure"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "organizer" : "Mik",
+          "name" : "Elasticsearch San Francisco"
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "tags" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "elasticsearch",
+          "doc_count" : 2
+        },
+        {
+          "key" : "search",
+          "doc_count" : 1
+        }
+      ]
+    }
+  }
+}
+
+
+# 6.显著词条significant_terms聚集就非常有用了,significant_terms聚集更像是terms聚集,它会统计词频.
+# 但是结果桶是按照分数来排序的,该分数代表了front文档和background文档之间的百分比差异.
+# param mentions: {"attendees": "lee"}前台文档是lee所参加的活动, field需要在文档中相对于整体而言出现更频繁的参与者.
+curl -H "Content-Type:application/json" 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "query": {
+        "match": {
+            "attendees": "lee"
+        }
+    },
+    "aggregations": {
+        "significant_attendees": {
+            "significant_terms": {
+                "field": "attendees",
+                "min_doc_count": 2,
+                "exclude": "lee"
+            }
+        }
+    }
+}'
+
+{
+  "took" : 4,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 0.45315093,
+    "hits" : [
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "100",
+        "_score" : 0.45315093,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Troy",
+            "Daniel",
+            "Tom"
+          ]
+        }
+      },
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "103",
+        "_score" : 0.45315093,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Martin",
+            "Greg",
+            "Mike"
+          ]
+        }
+      },
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "102",
+        "_score" : 0.2876821,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Tyler",
+            "Daniel",
+            "Stuart",
+            "Lance"
+          ]
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "significant_attendees" : {
+      "doc_count" : 3,
+      "bg_count" : 4,
+      "buckets" : []
+    }
+  }
+}
+
+## error: Set fielddata=true on [attendees] in order to load fielddata in memory by uninverting the inverted index
+curl -H "Content-Type:application/json" -XPUT 'localhost:9200/event-index/_mapping/event' -d '{
+    "event": {
+        "properties": {
+            "attendees": {
+                "type": "text",
+                "fielddata": true
+            }
+        }
+    }
+}'
+
+{"acknowledged":true}
+
+## range聚集: range能解决按照数值范围对文档进行分组,文档范围不必是连续的,它们可以是分离的或者是重叠的
+# (大多数情况下覆盖所有取值更合理,但是你不一定要那么做).
+curl -H "Content-Type:application/json" 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "aggregations": {
+        "attendees_breakdown": {
+            "range": {
+                "script": "doc['"'attendees'"'].values.length",
+                "ranges": [
+                    {"to": 4},
+                    {"from": 4, "to": 6},
+                    {"from": 6}
+                ]
+            }
+        }
+    },
+    "_source": ["attendees", "name"]
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 4,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "100",
+        "_score" : 1.0,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Troy",
+            "Daniel",
+            "Tom"
+          ]
+        }
+      },
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "101",
+        "_score" : 1.0,
+        "_source" : {
+          "attendees" : [
+            "Daniel",
+            "Michael",
+            "Sean"
+          ]
+        }
+      },
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "103",
+        "_score" : 1.0,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Martin",
+            "Greg",
+            "Mike"
+          ]
+        }
+      },
+      {
+        "_index" : "event-index",
+        "_type" : "event",
+        "_id" : "102",
+        "_score" : 1.0,
+        "_source" : {
+          "attendees" : [
+            "Lee",
+            "Tyler",
+            "Daniel",
+            "Stuart",
+            "Lance"
+          ]
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "attendees_breakdown" : {
+      "buckets" : [
+        {
+          "key" : "*-4.0",
+          "to" : 4.0,
+          "doc_count" : 1
+        },
+        {
+          "key" : "4.0-6.0",
+          "from" : 4.0,
+          "to" : 6.0,
+          "doc_count" : 3
+        },
+        {
+          "key" : "6.0-*",
+          "from" : 6.0,
+          "doc_count" : 0
+        }
+      ]
+    }
+  }
+}
+
+# date_range聚集和range聚集一样运作,除了放在范围定义中的是日期字符串.由于这一点你应该定义日期格式,这样elasticsearch才知道如何翻译
+# 你所提供的字符串,并将其转换为日期字符串所存储的形式.
+curl -H "Content-Type:application/json" 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "aggregations": {
+        "date_breakdown": {
+            "date_range": {
+                "field": "date",
+                "format": "YYYY.MM",
+                "ranges": [
+                    {"to": "2013.07"},
+                    {"from": "2013.07"}
+                ]
+            }
+        }
+    },
+    "_source": ["attendees", "name"],
+    "size": 0
+}'
+
+{
+  "took" : 36,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 4,
+    "max_score" : 0.0,
+    "hits" : []
+  },
+  "aggregations" : {
+    "date_breakdown" : {
+      "buckets" : [
+        {
+          "key" : "*-2013.07",
+          "to" : 1.3726368E12,
+          "to_as_string" : "2013.07",
+          "doc_count" : 1
+        },
+        {
+          "key" : "2013.07-*",
+          "from" : 1.3726368E12,
+          "from_as_string" : "2013.07",
+          "doc_count" : 3
+        }
+      ]
+    }
+  }
+}
+
+
+# 嵌套多桶聚集:为了将一个聚集和另一个嵌套起来,只需要在父聚集类型的同一层,使用aggregations或者aggs键.
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "aggregations": {
+        "top_tags": {
+            "terms": {
+                "field": "tags.verbatim"
+            },
+            "aggregations": {
+                "groups_per_month": {
+                    "date_histogram": {
+                        "field": "created_on",
+                        "interval":"1M"
+                    },
+                    "aggregations": {
+                        "number_of_members": {
+                            "range": {
+                                "script": "doc['"'members'"'].values.length",
+                                "ranges": [
+                                    {"to": 3},
+                                    {"from": 3}
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "_source": ["attendees", "name"],
+    "size": 0
+}'
+
+{
+  "took" : 8,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 4,
+    "max_score" : 0.0,
+    "hits" : []
+  },
+  "aggregations" : {
+    "top_tags" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : []
+    }
+  }
+}
+
+# 通过嵌套聚集获得结果分组(想按照特定的分类将排名靠前的结果进行分组时,结果分组是很有用处的).
+curl -H "Content-Type:application/json" 'localhost:9200/event-index/event/_search?pretty' -d '{
+    "aggregations": {
+        "frequent_attendees": {
+            "terms": {
+                "field": "attendees",
+                "size": 2
+            },
+            "aggregations": {
+                "recent_events": {
+                    "top_hits": {
+                        "sort": {
+                            "date": "desc"
+                        },
+                        "_source": {
+                            "include": ["title"]
+                        },
+                        "size": 1
+                    }
+                }
+            }
+        }
+    },
+    "_source": ["attendees", "name"],
+    "size": 0
+}'
+
+
+{
+  "took" : 56,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 4,
+    "max_score" : 0.0,
+    "hits" : []
+  },
+  "aggregations" : {
+    "frequent_attendees" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 10,
+      "buckets" : [
+        {
+          "key" : "daniel",
+          "doc_count" : 3,
+          "recent_events" : {
+            "hits" : {
+              "total" : 3,
+              "max_score" : null,
+              "hits" : [
+                {
+                  "_index" : "event-index",
+                  "_type" : "event",
+                  "_id" : "100",
+                  "_score" : null,
+                  "_source" : {
+                    "title" : "Liberator and Immutant"
+                  },
+                  "sort" : [
+                    1378404000000
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "key" : "lee",
+          "doc_count" : 3,
+          "recent_events" : {
+            "hits" : {
+              "total" : 3,
+              "max_score" : null,
+              "hits" : [
+                {
+                  "_index" : "event-index",
+                  "_type" : "event",
+                  "_id" : "100",
+                  "_score" : null,
+                  "_source" : {
+                    "title" : "Liberator and Immutant"
+                  },
+                  "sort" : [
+                    1378404000000
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# 使用单桶聚集:global聚集帮助我们展示整体的热门标签(单桶聚集还包括filter聚集、missing聚集).
+curl -H "Content-Type:application/json" 'localhost:9200/get-together/group/_search?pretty' -d '{
+    "query": {
+        "match": {
+            "name": "elasticsearch"
+        }
+    },
+    "aggregations": {
+        "all_documents": {
+            "global": {},
+            "aggregations": {
+                "top_tags": {
+                    "terms": {
+                        "field": "organizer"
+                    }
+                }
+            }
+        }
+    },
+    "_source": ["name", "organizer"]
+}'
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 0.87138504,
+    "hits" : [
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "2",
+        "_score" : 0.87138504,
+        "_source" : {
+          "organizer" : "Lee",
+          "name" : "Elasticsearch Denver"
+        }
+      },
+      {
+        "_index" : "get-together",
+        "_type" : "group",
+        "_id" : "3",
+        "_score" : 0.2876821,
+        "_source" : {
+          "organizer" : "Mik",
+          "name" : "Elasticsearch San Francisco"
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "all_documents" : {
+      "doc_count" : 5,
+      "top_tags" : {
+        "doc_count_error_upper_bound" : 0,
+        "sum_other_doc_count" : 0,
+        "buckets" : [
+          {
+            "key" : "lee",
+            "doc_count" : 2
+          },
+          {
+            "key" : "andy",
+            "doc_count" : 1
+          },
+          {
+            "key" : "daniel",
+            "doc_count" : 1
+          },
+          {
+            "key" : "mik",
+            "doc_count" : 1
+          },
+          {
+            "key" : "tyler",
+            "doc_count" : 1
+          }
+        ]
+      }
+    }
+  }
+}
+
+
