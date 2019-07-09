@@ -58,6 +58,33 @@ curl 'localhost:9200/event-object-index/_mapping/event-object?pretty'
 }
 
 
+# 统计elasticsearch中entid字段的最大长度(通过对属性字段长度进行排序得出结果).
+# "script": "doc['"'members'"'].values.length"
+curl -H "Content-Type:application/json" '192.168.207.23:9210/entdatasource_20190517/doc/_search?pretty' -d '{
+    "query": {
+        "match_all": {}
+    },
+    "sort": {
+        "_script": {
+            "script": "doc['"'creditcode'"'].value.length()",
+            "type": "number",
+            "order": "desc"
+        }
+    },
+    "_source": ["creditcode", "name"]
+}'
+
+# 2.映射并索引嵌套文档,嵌套文档和对象映射看上去差不多(不过其type不是object,而必须是nested).
+curl -XPUT 'localhost:9200/group-nested-index'
+{"acknowledged":true,"shards_acknowledged":true,"index":"group-nested-index"}
+
+curl -H "Content-Type:application/json" -XPUT 'localhost:9200/group-nested-index/_mapping_group-nested' -d '{
+    
+}'
+
+
+
+
 
 
 
