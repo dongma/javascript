@@ -1,8 +1,9 @@
-## jquery前端框架的一些常用函数
+## jQuery前端框架的一些常用函数
 
-> 概述：在该markdown文档中主要整理一些jquery操作数据集合/ajax发起异步请求/操作dom元素的函数；后期可能会加上jquery选择器的内容；
+> 概述：在该markdown文档中主要整理一些jQuery操作数据集合、ajax发起异步请求、操作dom元素的函数，后期会加上jQuery选择器的内容。jQuery基于原生的`javascript`语法进行封装函数，其语法更简洁易代码读性更好。其原生支持跨浏览器使得同一份代码在不同浏览器中显示的效果保持一致。
 
-1. 对于jquery前端库与其它使用到$符号的库解决冲突的函数：
+### jQuery操作数据集用法：
+1. 对于`jQuery`前端库与其它使用到$符号的库解决冲突的函数：
 ```javascript
   $.noConflict();	// 当使用此函数之后，调用jquery的方法的时候只能使用jQuery前缀符号.
 ```
@@ -64,14 +65,14 @@
   // 语法: 将元素的name属性从element元素上进行移除.
   $.removeData(element, name);
 ```
-12. jquery解析`json`字符串，原生的javascript使用`eval()`对json进行解析.
+12. jQuery解析`json`字符串，原生的javascript使用`eval()`对json进行解析.
 ```javascript
   // 语法:解析传入的json字符串并返回计算值.
   $.parseJSON(json);
 ```
 
-### jquery发起异步请求ajax的使用.
-ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提供了一组丰富工具集供我们使用。对于加载Html内容到DOM元素，提供了`load()`方法，使用`GET`还是`POST`方法取决于如何提供传递到服务器的参数数据。
+### jQuery发起异步请求ajax的使用：
+ajax是新一波dom脚本应用程序的关键部分，jQuery也非常乐意提供了一组丰富工具集供我们使用。对于加载Html内容到DOM元素，提供了`load()`方法，使用`GET`还是`POST`方法取决于如何提供传递到服务器的参数数据。
 1. 使用`$.load()`从服务器端加载资源内容.
 ```javascript
   // 语法: $.load(url, parameters, callback) parameters可以为字符串或者对象，如果是指定为对象或者数组，则使用POST方法发起请求。如果省略或者指定为字符串则默认使用GET请求.
@@ -111,7 +112,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
   $.ajaxSetup(options);
 ```
 
-### jQuery选择器的使用，以及对包装集合操作的函数.
+### jQuery选择器的使用，以及对包装集合操作的函数：
 常用选择器：`#specialId` 匹配id为specialID的元素；`.specialClass` 匹配所有拥有CSS类specialClass的元素；`a#specialID.specialClass` 匹配id为specialID并且拥有CSS类`specialClass`的链接元素；p a.specialClass 匹配所有拥有CSS类specialClss的链接元素并且这个元素是<p>的子节点.
 1. 确定包装集大小 `$(selector).size()`方法/ 从包装集中获取元素的 `$(selector).get(index)`方法.
 ```javascript
@@ -120,7 +121,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
 ```
 2. 从包装集中查找指定的元素`eq(index)`/`first()`/`last()`,最终的返回结果还是为包装集.
 ```javascript
-  var divWrapper = $('div').eq(1);   // 从jquery选择的集合中获取index为1的元素.
+  var divWrapper = $('div').eq(1);   // 从jQuery选择的集合中获取index为1的元素.
   var firstWrapper = $('div').first(); // 从选择器集合中获取第一个元素.
   var lastWrapper = $('div').last();   // 从选择器中获取最后一个元素. 
 ```
@@ -168,6 +169,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
   // is(Selector)确定包装集中是否存在于传入的选择器表达式相匹配的元素.
   var hasImage = $('*').is('img');	// 这个语句会将变量hasImage的值设置为true，前提是当前DOM中包含图片元素.
 ```
+
 11. 管理jquery调用链，`end()`和`endSelf()`方法.
 ```javascript
   // 语法: end()在jQuery方法链中用来将当前包装集回滚到前一个返回的包装集.
@@ -176,7 +178,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
   $('div').addClass('a').find('img').addClass('b').andSelf().addClass('c');
 ```
 
-### jQuery操作获取/设置元素特性，操作元素的CSS类名/dom元素的内容.
+### jQuery操作获取/设置元素特性，操作元素的CSS类名、DOM元素的内容.
 1. 操作元素属性 `attr(name)`/设置特性的值`attr(name, value)`/移除元素的属性attr.
 ```javascript
   // 语法: attr(name) 返回第一个匹配元素的特性值。如果匹配为空或者第一个元素不存在此特性，则返回undefined.
@@ -209,7 +211,7 @@ ajax是新一波dom脚本应用程序的关键部分，jquery也非常乐意提�
   // 语法: hasClass(name) 确定匹配集中是否有元素拥有通过name参数传入的类名,如果存在则返回true否则返回false.
   $('p:first').hasClass('surpriseMe');
 ```
-4. 设置样式`css()`
+4. 设置样式`CSS()`
 ```javascript
   // 语法: css(name,value) 设置每个匹配元素的已命名css样式属性为指定的值.
   $('div.expandable').css('width', function(index, currentWidth) { return currentWidth+20; });

@@ -79,7 +79,6 @@ curl -XPUT 'localhost:9200/group-nested-index'
 {"acknowledged":true,"shards_acknowledged":true,"index":"group-nested-index"}
 
 curl -H "Content-Type:application/json" -XPUT 'localhost:9200/group-nested-index/_mapping_group-nested' -d '{
-    
 }'
 
 
