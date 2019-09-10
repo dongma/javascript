@@ -114,3 +114,23 @@ db.getCollection('record').find({$or: [
  * mongodb print all node size(beneficiary record)
  */
 db.getCollection('record').aggregate([{$project: {nodes: {$size: '$sourceData.data.nodes'}}}]);
+
+/**
+ * use $and condition for filter updateTime and exists beneficiary field
+ */
+db.getCollection('record').find({
+    $and:[
+        {'updateTime': {'$gt': 1565049600000}},
+        {'beneficiary': {$exists: true}}
+    ]
+}).count();
+
+/**
+ * use $size to filter record documents which size greater than 2
+ */
+db.getCollection('record').find({
+    $and: [
+        {'updateTime': {'$gt': 1565049600000}},
+        {'beneficiary': {'$exists': true}}
+    ]
+});
