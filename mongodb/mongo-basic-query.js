@@ -134,3 +134,13 @@ db.getCollection('record').find({
         {'beneficiary': {'$exists': true}}
     ]
 });
+
+/**
+ * using mongodb shell to create index
+ */
+db.getCollection('monitor_data_push_log').createIndex({'PUSH_TIME':1});
+
+/**
+ * using mongodb shell sort document
+ */
+db.getCollection('monitor_data_push_log').find().sort({'PUSH_TIME':1});
