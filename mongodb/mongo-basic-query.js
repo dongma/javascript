@@ -144,3 +144,20 @@ db.getCollection('monitor_data_push_log').createIndex({'PUSH_TIME':1});
  * using mongodb shell sort document
  */
 db.getCollection('monitor_data_push_log').find().sort({'PUSH_TIME':1});
+
+
+
+/**
+ * 2019-10-24 add mongodb shell scripts by Sam Ma
+ * beneficiary-monitor-push offline application DAO (data access layer)
+ * using mongodb in、and operator match relevant records (high level query)
+ */
+db.getCollection('record').find({
+    $and: [
+        {"entId": {$in: ["3774d2d292dc61eb568635a45882e629", "77d93e52b8094ba7c0bf3579d06dcf4c"]}},
+        {"updateTime": {$gte: 1571241600000, $lt: 1571846400000}}
+    ]
+});
+
+
+
