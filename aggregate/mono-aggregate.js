@@ -22,3 +22,5 @@ db.getCollection('books').aggregate([
     {$limit: 2}
 ]);
 
+// $group mongodb fields with multiple field, relevant sql: [select * from monitor_entlist group by userId, uid]
+db.getCollection('monitor_entlist').aggregate([{$group:{_id :{"uid":"$UID", "userId":"$USERID"}}}]);

@@ -159,5 +159,4 @@ db.getCollection('record').find({
     ]
 });
 
-
-
+db.getCollection('record').find({'updateTime': {$gte:1569735912000, $lt:1572327912000}});
