@@ -160,3 +160,11 @@ db.getCollection('record').find({
 });
 
 db.getCollection('record').find({'updateTime': {$gte:1569735912000, $lt:1572327912000}});
+
+/**
+ * mongodb查找数组元素不为空的document (符合条件)
+ */
+db.getCollection('record').find({$where: "this.companyInfo.length == 2"});
+
+// 从mongodb的record中查找companyInfo数组元素至少为2的文档记录
+db.getCollection('record').find({"companyInfo.1": {"$exists": 1}}).limit(50);
