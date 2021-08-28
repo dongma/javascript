@@ -13,7 +13,7 @@ curl -H "Content-Type:application/json" 'localhost:9200/event-object-index/event
 }'
 {"_index":"event-object-index","_type":"event-object","_id":"1","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":0,"_primary_term":1}
 
-# 通过curl查看event-object对象的映射类型(_mapping).
+# 通过curl查看event-object对象的映射类型(_mapping)
 curl 'localhost:9200/event-object-index/_mapping/event-object?pretty'
 {
   "event-object-index" : {
@@ -58,7 +58,7 @@ curl 'localhost:9200/event-object-index/_mapping/event-object?pretty'
 }
 
 
-# 统计elasticsearch中entid字段的最大长度(通过对属性字段长度进行排序得出结果).
+# 统计elasticsearch中entid字段的最大长度(通过对属性字段长度进行排序得出结果)
 # "script": "doc['"'members'"'].values.length"
 curl -H "Content-Type:application/json" '192.168.207.23:9210/entdatasource_20190517/doc/_search?pretty' -d '{
     "query": {
@@ -80,10 +80,3 @@ curl -XPUT 'localhost:9200/group-nested-index'
 
 curl -H "Content-Type:application/json" -XPUT 'localhost:9200/group-nested-index/_mapping_group-nested' -d '{
 }'
-
-
-
-
-
-
-
